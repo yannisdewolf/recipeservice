@@ -49,7 +49,7 @@ public class Recipe implements Serializable {
                 .add("id='" + id + "'")
                 .add("name='" + name + "'")
                 .add("extraInfo='" + extraInfo + "'")
-                .add("ingredients=[" + ingredients.stream().map(Ingredient::getId).map(IngredientId::getUuid).collect(Collectors.joining(",")) + "]")
+//                .add("ingredients=[" + ingredients.stream().map(Ingredient::getId).map(IngredientId::getUuid).collect(Collectors.joining(",")) + "]")
                 .toString();
     }
 

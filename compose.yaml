@@ -21,3 +21,12 @@ services:
       - mysql
     environment:
       ADMINER_DEFAULT_SERVER: mysql # since we use docker, this should be the same name as the service from the db
+  rabbitmq:
+    image: rabbitmq:3.12.7-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
