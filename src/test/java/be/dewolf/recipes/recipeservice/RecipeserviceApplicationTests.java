@@ -1,13 +1,107 @@
 package be.dewolf.recipes.recipeservice;
 
+import be.dewolf.recipes.recipeservice.model.Recipe;
+import be.dewolf.recipes.recipeservice.repository.RecipeRepository;
+import be.dewolf.recipes.recipeservice.service.MessageSendingService;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConnectionFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Fail;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
+import org.testcontainers.utility.DockerImageName;
 
-@SpringBootTest
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "app.initializedata=false",
+                "app.listener.active=false"})
+@ContextConfiguration(initializers = TestContainerInitializer.class)
 class RecipeserviceApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+
+    @Autowired
+    private RecipeRepository recipeRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Test
+    void contextLoads() {
+
+    }
+
+    @Test
+    void sendMessageWhenCreatingRecipe() throws Exception {
+        JSONObject createRecipeData = new JSONObject();
+        createRecipeData.put("name", "soep");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        HttpEntity<String> body = new HttpEntity<>(createRecipeData.toString(), headers);
+
+        ResponseEntity<String> createResponse = testRestTemplate.postForEntity("/recipes", body, String.class);
+
+        Assertions.assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        List<Recipe> allFound = recipeRepository.findAll();
+
+        Assertions.assertThat(allFound).hasSize(1)
+                .extracting(Recipe::getName)
+                .contains("soep");
+
+        await().atMost(5, TimeUnit.SECONDS)
+                .until(() -> {
+                    Integer messageCount = rabbitTemplate.execute(channel -> channel.queueDeclare("recipeservice.recipe-created", true, false, false, null).getMessageCount());
+                    String s = (String) rabbitTemplate.receiveAndConvert("recipeservice.recipe-created");
+
+                    return messageCount == 1 && s != null;
+                });
+
+    }
+
+    @Slf4j
+    @TestConfiguration
+    static class RabbitTestConfiguration {
+
+        @Bean
+        DLQListener dlqListener() {
+            return new DLQListener();
+        }
+
+    }
 
 }

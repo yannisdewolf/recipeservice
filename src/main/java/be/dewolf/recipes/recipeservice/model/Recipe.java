@@ -2,10 +2,7 @@ package be.dewolf.recipes.recipeservice.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -49,7 +46,6 @@ public class Recipe implements Serializable {
                 .add("id='" + id + "'")
                 .add("name='" + name + "'")
                 .add("extraInfo='" + extraInfo + "'")
-//                .add("ingredients=[" + ingredients.stream().map(Ingredient::getId).map(IngredientId::getUuid).collect(Collectors.joining(",")) + "]")
                 .toString();
     }
 

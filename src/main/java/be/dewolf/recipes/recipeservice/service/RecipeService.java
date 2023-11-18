@@ -26,12 +26,14 @@ public class RecipeService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Recipe create(RecipeCreateData recipeCreateData) {
-        Recipe recipe = recipeRepository.findByName(recipeCreateData.name())
-                .orElseGet(() -> recipeRepository.save(recipeConverter.create(recipeCreateData)));
+        return recipeRepository.findByName(recipeCreateData.name())
+                .orElseGet(() -> createRepository(recipeCreateData));
+    }
 
-        messageSendingService.sendMessage(recipe);
-
-        return recipe;
+    private Recipe createRepository(RecipeCreateData recipeCreateData) {
+        Recipe r = recipeRepository.save(recipeConverter.create(recipeCreateData));
+        messageSendingService.sendMessage(r);
+        return r;
     }
 
     public Recipe getRecipe(RecipeId recipeId) {
