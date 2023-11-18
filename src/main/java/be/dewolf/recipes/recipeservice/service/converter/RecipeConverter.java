@@ -1,4 +1,4 @@
-package be.dewolf.recipes.recipeservice;
+package be.dewolf.recipes.recipeservice.service.converter;
 
 import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.model.RecipeId;

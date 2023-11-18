@@ -2,43 +2,23 @@ package be.dewolf.recipes.recipeservice;
 
 import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.repository.RecipeRepository;
-import be.dewolf.recipes.recipeservice.service.MessageSendingService;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Fail;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
@@ -47,7 +27,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
         properties = {
                 "app.initializedata=false",
                 "app.listener.active=false"})
-@ContextConfiguration(initializers = TestContainerInitializer.class)
+@ContextConfiguration(initializers = { MySqlTestContainerInitializer.class, RabbitMqTestContainerInitializer.class })
 class RecipeserviceApplicationTests {
 
     @Autowired
