@@ -32,6 +32,7 @@ public class RecipeController {
     @GetMapping("/{id}")
     @Transactional
     public RecipeDto getById(@PathVariable RecipeId id) {
+        log.info("get recipe by id {}", id);
         return recipeDtoConverter.create(recipeService.getRecipe(id));
     }
 

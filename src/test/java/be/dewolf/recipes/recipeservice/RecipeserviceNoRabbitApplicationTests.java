@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,26 +19,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.argThat;
 
+// starts complete application but with a mocked RabbitMQ
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = "withoutrabbit")
-@Testcontainers
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
-public class RecipeserviceNoRabbitApplicationTests {
+@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
 
-    @Container
-    static MySQLContainer mySQLContainer = new MySQLContainer<>(DockerImageName.parse("arm64v8/mysql:oracle").asCompatibleSubstituteFor("mysql"));
+public class RecipeserviceNoRabbitApplicationTests {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -50,18 +43,10 @@ public class RecipeserviceNoRabbitApplicationTests {
     @MockBean
     private MessageSendingService messageSendingService;
 
-    @Value("${app.fullblownrabbit}")
-    private String fullblownRabbit;
-
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> mySQLContainer.getJdbcUrl());
-        registry.add("spring.datasource.driverClassName", () -> mySQLContainer.getDriverClassName());
-        registry.add("spring.datasource.username", () -> mySQLContainer.getUsername());
-        registry.add("spring.datasource.password", () -> mySQLContainer.getPassword());
-    }
-
     @Test
+    @Sql(statements = {
+            "DELETE from Recipe"
+    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void savesRecipe() throws Exception {
         JSONObject createRecipeData = new JSONObject();
         createRecipeData.put("name", "soep");
@@ -87,8 +72,11 @@ public class RecipeserviceNoRabbitApplicationTests {
 
     @Test
     @Sql(statements = {
-            "INSERT INTO Recipe(ID, name, deleted) value ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
+            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
     })
+    @Sql(statements = {
+            "DELETE from Recipe"
+    }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getsRecipe() throws Exception {
         // Given
 
@@ -99,6 +87,17 @@ public class RecipeserviceNoRabbitApplicationTests {
         Assertions.assertThat(forEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         String body = forEntity.getBody();
         JSONAssert.assertEquals("{\"id\":\"2e01f6eb-212f-484b-8ed3-7f745ef132d7\",\"name\":\"erwtensoep\"}", body, true);
+    }
+
+    @Test
+    void returns_404_when_not_found() throws Exception {
+        // Given
+
+        // When
+        ResponseEntity<String> forEntity = testRestTemplate.getForEntity("/recipes/2e01f6eb-212f-484b-8ed3-7f745ef132d7", String.class);
+
+        // Then
+        Assertions.assertThat(forEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }
