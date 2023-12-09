@@ -134,29 +134,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>mac</id>
-            <activation>
-                <property>
-                    <name>app.testcontainer.platform</name>
-                    <value>arm</value>
-                </property>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>github</id>
-            <activation>
-                <property>
-                    <name>app.testcontainer.platform</name>
-                    <value>linux</value>
-                </property>
-            </activation>
-        </profile>
-
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
