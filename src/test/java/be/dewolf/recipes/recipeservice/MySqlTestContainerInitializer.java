@@ -8,7 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MySqlTestContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    static MySQLContainer mySQLContainer = new MySQLContainer<>(DockerImageName.parse("arm64v8/mysql:oracle").asCompatibleSubstituteFor("mysql"));
+    static MySQLContainer mySQLContainer = new MySQLContainer<>(DockerImageName.parse("mysql:oracle").asCompatibleSubstituteFor("mysql"));
 
     static {
         mySQLContainer.start();
