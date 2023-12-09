@@ -3,6 +3,8 @@ package be.dewolf.recipes.recipeservice;
 import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.repository.RecipeRepository;
 import be.dewolf.recipes.recipeservice.service.MessageSendingService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 @ActiveProfiles(value = "withoutrabbit")
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
 @ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
-
 public class RecipeserviceNoRabbitApplicationTests {
 
     @Autowired
@@ -42,6 +43,9 @@ public class RecipeserviceNoRabbitApplicationTests {
 
     @MockBean
     private MessageSendingService messageSendingService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @Sql(statements = {
@@ -64,6 +68,9 @@ public class RecipeserviceNoRabbitApplicationTests {
         Assertions.assertThat(allFound).hasSize(1)
                 .extracting(Recipe::getName)
                 .contains("soep");
+
+        List<Recipe> selectAFromRecipeA = entityManager.createQuery("select a from Recipe a", Recipe.class).getResultList();
+        Assertions.assertThat(selectAFromRecipeA).hasSize(1);
 
         Mockito.verify(messageSendingService, Mockito.times(1))
                 .sendMessage(argThat(r -> r.getName().equalsIgnoreCase("soep")));

@@ -7,9 +7,6 @@ import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.model.RecipeId;
 import be.dewolf.recipes.recipeservice.service.RecipeCreateData;
 import be.dewolf.recipes.recipeservice.service.RecipeService;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
-import io.micrometer.observation.annotation.Observed;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,8 +26,9 @@ public class RecipeController {
     private RecipeService recipeService;
     private RecipeDtoConverter recipeDtoConverter;
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
+    @ResponseBody
     public RecipeDto getById(@PathVariable RecipeId id) {
         log.info("get recipe by id {}", id);
         return recipeDtoConverter.create(recipeService.getRecipe(id));
@@ -46,7 +44,8 @@ public class RecipeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public RecipeDto createRecipe(@RequestBody CreateRecipeDto createRecipeDto) {
         Recipe recipe = recipeService.create(new RecipeCreateData(createRecipeDto.getName()));
-        return recipeDtoConverter.create(recipe);
+        RecipeDto recipeDto = recipeDtoConverter.create(recipe);
+        return recipeDto;
     }
 
 }
