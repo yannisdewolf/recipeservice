@@ -1,5 +1,18 @@
 # Recipeservice
 
+Service responsible for
+- creating recipes
+- listing recipes
+- updating recipes
+- get recipes by id
+
+Based on the BookService from Cloud Native Spring in Action book.
+
+## Integrations:
+- Rabbit (To be removed), tests to interact with Rabbit using TestContainers.
+- MySql, tests using TestContainers
+
+
 ## 
 
 ## Docker compose

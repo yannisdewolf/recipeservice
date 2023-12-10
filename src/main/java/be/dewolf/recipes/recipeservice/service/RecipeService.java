@@ -1,9 +1,9 @@
 package be.dewolf.recipes.recipeservice.service;
 
-import be.dewolf.recipes.recipeservice.service.converter.RecipeConverter;
 import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.model.RecipeId;
-import be.dewolf.recipes.recipeservice.repository.RecipeRepository;
+import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
+import be.dewolf.recipes.recipeservice.service.converter.RecipeConverter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 public class RecipeService {
 
-    private RecipeRepository recipeRepository;
+    private MyRecipeRepository recipeRepository;
     private RecipeConverter recipeConverter;
     private MessageSendingService messageSendingService;
 

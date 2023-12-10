@@ -1,5 +1,6 @@
 package be.dewolf.recipes.recipeservice.controller;
 
+import be.dewolf.recipes.recipeservice.config.ApplicationProperties;
 import be.dewolf.recipes.recipeservice.controller.converter.RecipeDtoConverter;
 import be.dewolf.recipes.recipeservice.controller.model.CreateRecipeDto;
 import be.dewolf.recipes.recipeservice.controller.model.RecipeDto;
@@ -26,6 +27,14 @@ public class RecipeController {
     private RecipeService recipeService;
     private RecipeDtoConverter recipeDtoConverter;
 
+    private ApplicationProperties applicationProperties;
+
+    @GetMapping(value = "/welcome", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getGreeting() {
+        log.info("Say hello");
+        return applicationProperties.getGreeting();
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @ResponseBody
@@ -44,8 +53,7 @@ public class RecipeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public RecipeDto createRecipe(@RequestBody CreateRecipeDto createRecipeDto) {
         Recipe recipe = recipeService.create(new RecipeCreateData(createRecipeDto.getName()));
-        RecipeDto recipeDto = recipeDtoConverter.create(recipe);
-        return recipeDto;
+        return recipeDtoConverter.create(recipe);
     }
 
 }

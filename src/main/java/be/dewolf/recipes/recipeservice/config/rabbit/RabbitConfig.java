@@ -2,6 +2,7 @@ package be.dewolf.recipes.recipeservice.config.rabbit;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(RabbitProperties.class)
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "app.fullblownrabbit", havingValue = "true")
 public class RabbitConfig {
 
     private final RabbitProperties rabbitProperties;

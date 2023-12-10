@@ -1,7 +1,7 @@
 package be.dewolf.recipes.recipeservice;
 
 import be.dewolf.recipes.recipeservice.model.Recipe;
-import be.dewolf.recipes.recipeservice.repository.RecipeRepository;
+import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
@@ -34,7 +34,7 @@ class RecipeserviceApplicationTests {
     private TestRestTemplate testRestTemplate;
 
     @Autowired
-    private RecipeRepository recipeRepository;
+    private MyRecipeRepository recipeRepository;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface RecipeRepository extends JpaRepository<Recipe, RecipeId>, JpaSpecificationExecutor<Recipe> {
+public interface RecipeRepository extends JpaRepository<Recipe, RecipeId>, JpaSpecificationExecutor<Recipe>, MyRecipeRepository {
 
     Optional<Recipe> findByName(String name);
 

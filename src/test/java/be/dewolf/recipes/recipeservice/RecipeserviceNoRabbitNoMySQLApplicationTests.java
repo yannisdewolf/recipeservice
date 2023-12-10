@@ -1,6 +1,7 @@
 package be.dewolf.recipes.recipeservice;
 
 import be.dewolf.recipes.recipeservice.model.Recipe;
+import be.dewolf.recipes.recipeservice.model.RecipeId;
 import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import be.dewolf.recipes.recipeservice.service.MessageSendingService;
 import org.assertj.core.api.Assertions;
@@ -16,8 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
@@ -25,11 +24,11 @@ import static org.mockito.ArgumentMatchers.argThat;
 
 // starts complete application but with a mocked RabbitMQ
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"app.data.inmemory=false"})
+        properties = {"app.data.inmemory=true"})
 @ActiveProfiles(value = "withoutrabbit")
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
-@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
-public class RecipeserviceNoRabbitApplicationTests {
+//@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
+public class RecipeserviceNoRabbitNoMySQLApplicationTests {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -41,9 +40,9 @@ public class RecipeserviceNoRabbitApplicationTests {
     private MessageSendingService messageSendingService;
 
     @Test
-    @Sql(statements = {
-            "DELETE from Recipe"
-    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//    @Sql(statements = {
+//            "DELETE from Recipe"
+//    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void savesRecipe() throws Exception {
         JSONObject createRecipeData = new JSONObject();
         createRecipeData.put("name", "soep");
@@ -68,19 +67,19 @@ public class RecipeserviceNoRabbitApplicationTests {
     }
 
     @Test
-    @Sql(statements = {
-            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
-    })
-    @Sql(statements = {
-            "DELETE from Recipe"
-    }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+//    @Sql(statements = {
+//            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
+//    })
+//    @Sql(statements = {
+//            "DELETE from Recipe"
+//    }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getsRecipe() throws Exception {
 
-//        recipeRepository.save(Recipe.builder()
-//                        .name("erwtensoep")
-//                        .deleted(false)
-//                        .id(RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d7"))
-//                .build());
+        recipeRepository.save(Recipe.builder()
+                        .name("erwtensoep")
+                        .deleted(false)
+                        .id(RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d7"))
+                .build());
 
         // Given
         HttpHeaders headers = new HttpHeaders();
