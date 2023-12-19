@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -29,7 +30,8 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
                 "app.listener.active=false",
                 "app.fullblownrabbit=true"
         })
-@ContextConfiguration(initializers = { MySqlTestContainerInitializer.class, RabbitMqTestContainerInitializer.class })
+@ActiveProfiles(value = {"integrationtest"})
+@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class, RabbitMqTestContainerInitializer.class})
 class RecipeserviceApplicationTests {
 
     @Autowired

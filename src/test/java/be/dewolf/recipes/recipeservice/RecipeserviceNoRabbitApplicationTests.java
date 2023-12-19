@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 // starts complete application but with a mocked RabbitMQ
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"app.data.inmemory=false"})
-@ActiveProfiles(value = "withoutrabbit")
+@ActiveProfiles(value = {"withoutrabbit", "integrationtest"})
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
 @ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
 public class RecipeserviceNoRabbitApplicationTests {
