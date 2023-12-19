@@ -26,7 +26,9 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "app.initializedata=false",
-                "app.listener.active=false"})
+                "app.listener.active=false",
+                "app.fullblownrabbit=true"
+        })
 @ContextConfiguration(initializers = { MySqlTestContainerInitializer.class, RabbitMqTestContainerInitializer.class })
 class RecipeserviceApplicationTests {
 
