@@ -8,12 +8,20 @@ Service responsible for
 
 Based on the BookService from Cloud Native Spring in Action book.
 
+## Flags in the properties
+| property            | values       | description                                                                                      |
+|---------------------|--------------|--------------------------------------------------------------------------------------------------|
+| app.fullblownrabbit | false / true | true: use rabbit integration<br/> false: use dummy message sending. No messages will be consumed |
+| app.initializedata  | false / true | true: initialize test data on startup of the service                                             |                                                                                            |
+| app.data.inmemory   | false / true | true: use all data in memory<br/> false: use mysql database (docker compose)                     |
+
 ## Integrations:
 - Rabbit (To be removed), tests to interact with Rabbit using TestContainers.
 - MySql, tests using TestContainers
 
 
-## 
+## Docker
+TODO: create a Dockerfile
 
 ## Docker compose
 A Docker compose file is included. 
