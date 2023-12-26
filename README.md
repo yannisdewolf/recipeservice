@@ -8,6 +8,9 @@ Service responsible for
 
 Based on the BookService from Cloud Native Spring in Action book.
 
+## TODO
+- replace MySQL with PostgreSQL
+
 ## Flags in the properties
 | property            | values       | description                                                                                      |
 |---------------------|--------------|--------------------------------------------------------------------------------------------------|
@@ -22,6 +25,16 @@ Based on the BookService from Cloud Native Spring in Action book.
 
 ## Docker
 TODO: create a Dockerfile
+
+```bash
+docker run -d \
+  --name recipe-postgress \
+  -e POSTGRES_USER=user \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=cuisinedb_recipes \
+  -p 5432:5432 \
+  postgres:16.1
+```
 
 ## Docker compose
 A Docker compose file is included. 
