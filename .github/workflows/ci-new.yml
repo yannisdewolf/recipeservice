@@ -3,9 +3,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Checkout code
+  unit-tests:
+    name: Unit tests
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -15,28 +18,26 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: maven
-
-  unit-tests:
-    name: Run unit tests
-    runs-on: ubuntu-22.04
-    needs: build
-    permissions:
-      contents: read
-      security-events: write
-    steps:
       - name: run tests
         run: |
           chmod +x mvnw
           ./mvnw package 
 
   integration-tests:
-    name: Run integration tests
+    name: Integration tests
     runs-on: ubuntu-22.04
-    needs: build
     permissions:
       contents: read
       security-events: write
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
       - name: run tests
         run: |
           chmod +x mvnw
