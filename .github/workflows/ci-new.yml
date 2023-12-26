@@ -20,6 +20,9 @@ jobs:
     name: Run unit tests
     runs-on: ubuntu-22.04
     needs: build
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: run tests
         run: |
@@ -30,6 +33,9 @@ jobs:
     name: Run integration tests
     runs-on: ubuntu-22.04
     needs: build
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: run tests
         run: |
