@@ -3,9 +3,16 @@ spring:
   config:
     import: "optional:configserver:"
   cloud:
-      uri: "http://localhost:8888"
-      request-connect-timeout: 5000
-      request-read-timeout: 5000
+    uri: "http://localhost:8888"
+    request-connect-timeout: 5000
+    request-read-timeout: 5000
+    config:
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        max-attempts: 20
+        max-interval: 6000
+        multiplier: 1.3
   application:
     name: recipe-service
   jpa:
@@ -33,7 +40,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: info,health,env,metrics
+#        refresh: enable hot reloading of properties via /actuator/refresh
+        include: info,health,env,metrics,refresh
   endpoint:
     env:
       show-values: always
