@@ -22,9 +22,9 @@ spring:
     generate-ddl: true
     open-in-view: false
   datasource:
-    url: "jdbc:mysql://localhost:3306/mydatabase"
-    username: myuser
-    password: secret
+    url: "jdbc:postgres://localhost:5432/cuisinedb_recipes"
+    username: user
+    password: password
   rabbitmq:
     listener:
       simple:

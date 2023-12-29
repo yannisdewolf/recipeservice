@@ -27,8 +27,7 @@ import static org.mockito.ArgumentMatchers.argThat;
         properties = {"app.data.inmemory=true"})
 @ActiveProfiles(value = {"withoutrabbit", "integrationtest"})
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
-//@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class})
-public class RecipeserviceNoRabbitNoMySQLApplicationTests {
+public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
 
     @Autowired
     private TestRestTemplate testRestTemplate;

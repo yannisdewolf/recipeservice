@@ -31,7 +31,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
                 "app.fullblownrabbit=true"
         })
 @ActiveProfiles(value = {"integrationtest"})
-@ContextConfiguration(initializers = {MySqlTestContainerInitializer.class, RabbitMqTestContainerInitializer.class})
+@ContextConfiguration(initializers = {PostgresTestContainerInitializer.class, RabbitMqTestContainerInitializer.class})
 class RecipeserviceApplicationTests {
 
     @Autowired

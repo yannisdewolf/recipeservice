@@ -15,7 +15,7 @@ class RecipeRepositoryIntegrationTest extends AbstractDataTest {
 
     @Test
     @Sql(statements = {
-            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
+            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false)"
     })
     void getsByName() throws Exception {
         // Given
