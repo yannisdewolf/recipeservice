@@ -1,13 +1,12 @@
 services:
-  mysql:
-    image: 'mysql'
+  postgres:
+    image: postgres:16.1
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'POSTGRES_USER=user'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_DB=cuisinedb_recipes'
     ports:
-      - '3306:3306'
+      - 5432:5432
   zipkin:
     image: 'openzipkin/zipkin:latest'
     ports:
@@ -18,7 +17,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - mysql
+      - postgres
     environment:
       ADMINER_DEFAULT_SERVER: mysql # since we use docker, this should be the same name as the service from the db
   rabbitmq:

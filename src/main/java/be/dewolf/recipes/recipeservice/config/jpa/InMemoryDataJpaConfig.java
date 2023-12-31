@@ -59,7 +59,7 @@ public class InMemoryDataJpaConfig {
 
             @Override
             public List<Recipe> findAll() {
-                return new ArrayList<>(recipes);
+                return new ArrayList<>(recipes.stream().filter(r -> !r.isDeleted()).toList());
             }
 
             @Override

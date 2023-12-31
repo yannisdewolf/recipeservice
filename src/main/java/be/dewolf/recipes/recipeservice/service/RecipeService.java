@@ -48,10 +48,14 @@ public class RecipeService {
     }
 
     public List<Recipe> findAll() {
-        return recipeRepository.findAll();
+        return recipeRepository.findAll().stream().filter(r -> !r.isDeleted()).toList();
     }
 
+    @Transactional
     public void delete(RecipeId recipeId) {
-        recipeRepository.remove(recipeId);
+        recipeRepository.findById(recipeId).ifPresent(r -> {
+            r.setDeleted(true);
+        });
+
     }
 }
