@@ -64,9 +64,25 @@ public class InMemoryDataJpaConfig {
 
             @Override
             public Recipe getReferenceById(RecipeId recipeId) {
-                return recipes.stream().filter(r -> r.getId().equals(recipeId)).findFirst()
+                return recipes.stream()
+                        .filter(r -> r.getId().equals(recipeId)).findFirst()
+                        .filter(r -> !r.isDeleted())
                         .orElseThrow(() -> new EntityNotFoundException("No recipe found with id " + recipeId));
             }
+
+            @Override
+            public Optional<Recipe> findById(RecipeId recipeId) {
+                return recipes.stream()
+                        .filter(r -> r.getId().equals(recipeId)).findFirst()
+                        .filter(r -> !r.isDeleted());
+            }
+
+            @Override
+            public void remove(RecipeId id) {
+                Optional<Recipe> recipeToDelete = recipes.stream().filter(r -> r.getId().equals(id)).findFirst();
+                recipeToDelete.ifPresent(r -> r.setDeleted(true));
+            }
+
         };
     }
 

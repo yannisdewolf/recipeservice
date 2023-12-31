@@ -1,8 +1,10 @@
 package be.dewolf.recipes.recipeservice;
 
 import be.dewolf.recipes.recipeservice.model.Recipe;
+import be.dewolf.recipes.recipeservice.model.RecipeId;
 import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import be.dewolf.recipes.recipeservice.service.MessageSendingService;
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,10 @@ import static org.mockito.ArgumentMatchers.argThat;
 
 // starts complete application but with a mocked RabbitMQ
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"app.data.inmemory=false"})
+        properties = {
+            "app.data.inmemory=false",
+            "spring.cloud.config.enabled=false"
+})
 @ActiveProfiles(value = {"withoutrabbit", "integrationtest"})
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
 @ContextConfiguration(initializers = {PostgresTestContainerInitializer.class})
@@ -69,7 +74,7 @@ public class RecipeserviceNoRabbitApplicationTests {
 
     @Test
     @Sql(statements = {
-            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false)"
+            "INSERT INTO Recipe(ID, name, deleted, created_on, last_modified_on) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false, '2023-12-30 20:59:59', '2023-12-30 20:59:59')"
     })
     @Sql(statements = {
             "DELETE from Recipe"
@@ -120,6 +125,30 @@ public class RecipeserviceNoRabbitApplicationTests {
 
         // Then
         Assertions.assertThat(response.getBody()).isEqualTo("hello world!");
+    }
+
+    @Test
+    @Sql(statements = {
+            "INSERT INTO Recipe(ID, name, deleted, created_on, last_modified_on) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false, '2023-12-30 20:59:59', '2023-12-30 20:59:59')"
+    })
+    @Sql(statements = {
+            "DELETE from Recipe"
+    }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void delete_recipe() throws Exception {
+        // Given
+        RecipeId from = RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d7");
+//        recipeRepository.save(Recipe.builder()
+//                .name("erwtensoep")
+//                .deleted(false)
+//                .id(from)
+//                .build());
+
+        // When
+        ResponseEntity<String> response = testRestTemplate.exchange("/recipes/2e01f6eb-212f-484b-8ed3-7f745ef132d7", HttpMethod.DELETE, null, String.class);
+
+        // Then
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(recipeRepository.findById(from)).isEmpty();
     }
 
 }

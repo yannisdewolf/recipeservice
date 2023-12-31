@@ -4,6 +4,7 @@ import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.model.RecipeId;
 import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import be.dewolf.recipes.recipeservice.service.converter.RecipeConverter;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,11 +44,14 @@ public class RecipeService {
     }
 
     public Recipe getRecipe(RecipeId recipeId) {
-        return recipeRepository.getReferenceById(recipeId);
+        return recipeRepository.findById(recipeId).orElseThrow(() -> new EntityNotFoundException("No recipe found with id " + recipeId));
     }
 
     public List<Recipe> findAll() {
         return recipeRepository.findAll();
     }
 
+    public void delete(RecipeId recipeId) {
+        recipeRepository.remove(recipeId);
+    }
 }

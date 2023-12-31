@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
+@DataJpaTest(properties = {"spring.cloud.config.enabled=false"})
 @ContextConfiguration(initializers = {PostgresTestContainerInitializer.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Slf4j
@@ -23,11 +23,5 @@ public class AbstractDataTest {
 
     @Autowired
     private MyRecipeRepository recipeRepository;
-
-//    @BeforeEach
-//    public void cleanDatabase() {
-//        log.info("cleaning");
-//        recipeRepository.deleteAll();;
-//    }
 
 }

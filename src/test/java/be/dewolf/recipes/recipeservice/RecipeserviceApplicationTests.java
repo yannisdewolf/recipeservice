@@ -4,6 +4,7 @@ import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,7 +29,9 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
         properties = {
                 "app.initializedata=false",
                 "app.listener.active=false",
-                "app.fullblownrabbit=true"
+                "app.fullblownrabbit=true",
+//                "app.data.inmemory=false",
+                "spring.cloud.config.enabled=false"
         })
 @ActiveProfiles(value = {"integrationtest"})
 @ContextConfiguration(initializers = {PostgresTestContainerInitializer.class, RabbitMqTestContainerInitializer.class})
@@ -63,15 +66,18 @@ class RecipeserviceApplicationTests {
         Assertions.assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         List<Recipe> allFound = recipeRepository.findAll();
 
-        Assertions.assertThat(allFound).hasSize(1)
-                .extracting(Recipe::getName)
-                .contains("soep");
+        SoftAssertions.assertSoftly(assertions -> {
+            assertions.assertThat(allFound).hasSize(1)
+                    .extracting(Recipe::getName)
+                    .contains("soep");
+            assertions.assertThat(allFound.get(0)).extracting(Recipe::getCreatedOn).isNotNull();
+        });
 
         await().atMost(5, TimeUnit.SECONDS)
                 .until(() -> {
                     Integer messageCount = rabbitTemplate.execute(channel -> channel.queueDeclare("recipeservice.recipe-created", true, false, false, null).getMessageCount());
                     String s = (String) rabbitTemplate.receiveAndConvert("recipeservice.recipe-created");
-
+                    System.out.println(s);
                     return messageCount == 1 && s != null;
                 });
 

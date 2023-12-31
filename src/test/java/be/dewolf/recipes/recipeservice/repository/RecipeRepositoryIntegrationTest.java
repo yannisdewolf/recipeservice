@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.time.*;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RecipeRepositoryIntegrationTest extends AbstractDataTest {
 
@@ -15,7 +18,7 @@ class RecipeRepositoryIntegrationTest extends AbstractDataTest {
 
     @Test
     @Sql(statements = {
-            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false)"
+            "INSERT INTO recipe(ID, name, deleted, created_on, last_modified_on) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', false, '2023-12-29 23:59:59', '2023-12-29 23:59:59')"
     })
     void getsByName() throws Exception {
         // Given
@@ -25,9 +28,12 @@ class RecipeRepositoryIntegrationTest extends AbstractDataTest {
         Optional<Recipe> actual = recipeRepository.findByName(recipeName);
 
         // Then
-        Assertions.assertThat(actual).isPresent()
-                        .map(Recipe::getName)
-                                .hasValue(recipeName);
+        assertThat(actual).isPresent()
+                .hasValueSatisfying(r -> {
+                    assertThat(r.getName()).isEqualTo(recipeName);
+                    assertThat(r.getCreatedOn()).isEqualTo(
+                            LocalDateTime.of(2023, Month.DECEMBER, 29, 23, 59, 59).toInstant(ZoneOffset.UTC));
+                });
     }
 
 }

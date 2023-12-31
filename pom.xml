@@ -167,7 +167,7 @@
                                 <include>**/*UnitTest</include>
                                 <include>**/*MvcTest</include>
                             </includes>
-                            <testFailureIgnore>true</testFailureIgnore>
+<!--                            <testFailureIgnore>true</testFailureIgnore>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -213,7 +213,7 @@
                         <exclude>**/*IntegrationTest</exclude>
                         <exclude>**/*ApplicationTests</exclude>
                     </excludes>
-                    <testFailureIgnore>true</testFailureIgnore>
+<!--                    <testFailureIgnore>true</testFailureIgnore>-->
                 </configuration>
             </plugin>
         </plugins>

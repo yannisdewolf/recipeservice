@@ -4,7 +4,10 @@ import be.dewolf.recipes.recipeservice.model.Recipe;
 import be.dewolf.recipes.recipeservice.model.RecipeId;
 import be.dewolf.recipes.recipeservice.repository.MyRecipeRepository;
 import be.dewolf.recipes.recipeservice.service.MessageSendingService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Fail;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,12 +22,16 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.argThat;
 
 // starts complete application but with a mocked RabbitMQ
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"app.data.inmemory=true"})
+        properties = {
+                "app.data.inmemory=true",
+                "spring.cloud.config.enabled=false"
+        })
 @ActiveProfiles(value = {"withoutrabbit", "integrationtest"})
 @EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
 public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
@@ -39,9 +46,6 @@ public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
     private MessageSendingService messageSendingService;
 
     @Test
-//    @Sql(statements = {
-//            "DELETE from Recipe"
-//    }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void savesRecipe() throws Exception {
         JSONObject createRecipeData = new JSONObject();
         createRecipeData.put("name", "soep");
@@ -54,11 +58,14 @@ public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
         ResponseEntity<String> createResponse = testRestTemplate.postForEntity("/recipes", body, String.class);
 
         Assertions.assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        List<Recipe> allFound = recipeRepository.findAll();
 
-        Assertions.assertThat(allFound).hasSize(1)
-                .extracting(Recipe::getName)
-                .contains("soep");
+        Map<String, Object> map = new ObjectMapper().readValue(createResponse.getBody(), Map.class);
+
+        String id = (String) map.get("id");
+
+        Recipe allFound = recipeRepository.getReferenceById(RecipeId.from(id));
+
+        Assertions.assertThat(allFound.getName()).isEqualTo("soep");
 
         Mockito.verify(messageSendingService, Mockito.times(1))
                 .sendMessage(argThat(r -> r.getName().equalsIgnoreCase("soep")));
@@ -66,18 +73,12 @@ public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
     }
 
     @Test
-//    @Sql(statements = {
-//            "INSERT INTO Recipe(ID, name, deleted) values ('2e01f6eb-212f-484b-8ed3-7f745ef132d7', 'erwtensoep', 0)"
-//    })
-//    @Sql(statements = {
-//            "DELETE from Recipe"
-//    }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getsRecipe() throws Exception {
 
         recipeRepository.save(Recipe.builder()
-                        .name("erwtensoep")
-                        .deleted(false)
-                        .id(RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d7"))
+                .name("erwtensoep")
+                .deleted(false)
+                .id(RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d7"))
                 .build());
 
         // Given
@@ -86,7 +87,7 @@ public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         // When
-        ResponseEntity<String> forEntity = testRestTemplate.exchange("/recipes/2e01f6eb-212f-484b-8ed3-7f745ef132d7", HttpMethod.GET, entity, String.class );
+        ResponseEntity<String> forEntity = testRestTemplate.exchange("/recipes/2e01f6eb-212f-484b-8ed3-7f745ef132d7", HttpMethod.GET, entity, String.class);
 
         // Then
         Assertions.assertThat(forEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -114,10 +115,29 @@ public class RecipeserviceNoRabbitInMemoryDataApplicationTests {
 
         // When
 
-        ResponseEntity<String> response = testRestTemplate.exchange("/recipes/welcome", HttpMethod.GET, entity, String.class );
+        ResponseEntity<String> response = testRestTemplate.exchange("/recipes/welcome", HttpMethod.GET, entity, String.class);
 
         // Then
         Assertions.assertThat(response.getBody()).isEqualTo("hello world!");
+    }
+
+    @Test
+    void delete_recipe() throws Exception {
+        // Given
+        RecipeId from = RecipeId.from("2e01f6eb-212f-484b-8ed3-7f745ef132d6");
+        recipeRepository.save(Recipe.builder()
+                .name("erwtensoep")
+                .deleted(false)
+                .id(from)
+                .build());
+
+        // When
+        ResponseEntity<String> response = testRestTemplate.exchange("/recipes/2e01f6eb-212f-484b-8ed3-7f745ef132d6", HttpMethod.DELETE, null, String.class);
+
+        // Then
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThatExceptionOfType(EntityNotFoundException.class).isThrownBy(() ->recipeRepository.getReferenceById(from))
+                .withMessage("No recipe found with id RecipeId(uuid=2e01f6eb-212f-484b-8ed3-7f745ef132d6)");
     }
 
 }

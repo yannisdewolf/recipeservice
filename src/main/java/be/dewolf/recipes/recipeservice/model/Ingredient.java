@@ -2,6 +2,7 @@ package be.dewolf.recipes.recipeservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.StringJoiner;
@@ -10,17 +11,18 @@ import java.util.StringJoiner;
 @Entity
 @Data
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Ingredient implements Serializable {
 
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "uuid", column = @Column(name = "ID", length = 36))
+            @AttributeOverride(name = "uuid", column = @Column(name = "id", length = 36))
     })
     private IngredientId id;
 
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 

@@ -2,12 +2,18 @@ package be.dewolf.recipes.recipeservice.model;
 
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 @Table
 @Entity
@@ -15,11 +21,12 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Recipe implements Serializable {
 
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "uuid", column = @Column(name = "ID", length = 36))
+            @AttributeOverride(name = "uuid", column = @Column(name = "id", length = 36))
     })
     private RecipeId id;
 
@@ -27,8 +34,7 @@ public class Recipe implements Serializable {
     @Column
     private String extraInfo;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "recipe")
     private List<Ingredient> ingredients;
 
     @Column
@@ -39,6 +45,14 @@ public class Recipe implements Serializable {
 
     @Version
     private Long version;
+
+    @Column
+    @CreatedDate
+    private Instant createdOn;
+
+    @Column
+    @LastModifiedDate
+    private Instant lastModifiedOn;
 
     @Override
     public String toString() {

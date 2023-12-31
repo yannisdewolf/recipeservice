@@ -56,4 +56,10 @@ public class RecipeController {
         return recipeDtoConverter.create(recipe);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteRecipe(@PathVariable("id") String recipeId) {
+        recipeService.delete(RecipeId.from(recipeId));
+    }
+
 }
