@@ -8,9 +8,6 @@ Service responsible for
 
 Based on the BookService from Cloud Native Spring in Action book.
 
-## TODO
-- replace MySQL with PostgreSQL
-
 ## Flags in the properties
 | property            | values       | description                                                                                      |
 |---------------------|--------------|--------------------------------------------------------------------------------------------------|
@@ -20,21 +17,11 @@ Based on the BookService from Cloud Native Spring in Action book.
 
 ## Integrations:
 - Rabbit (To be removed), tests to interact with Rabbit using TestContainers.
-- MySql, tests using TestContainers
+- PostgreSQL, tests using TestContainers
 
 
 ## Docker
 TODO: create a Dockerfile
-
-```bash
-docker run -d \
-  --name recipe-postgress \
-  -e POSTGRES_USER=user \
-  -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=cuisinedb_recipes \
-  -p 5432:5432 \
-  postgres:16.1
-```
 
 ## Docker compose
 A Docker compose file is included. 
@@ -45,6 +32,11 @@ When stopping the service, it will automatically stop the containers.
 
 For more info, see
 https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.docker-compose
+
+# Postgres
+
+Credentials:
+user/secret
 
 # RabbitMQ
 
@@ -65,5 +57,6 @@ http://localhost:9411/zipkin/
 
 # Metrics
 http://localhost:8081/actuator/metrics
+
 http://localhost:8081/actuator/metrics/recipe.id
 
