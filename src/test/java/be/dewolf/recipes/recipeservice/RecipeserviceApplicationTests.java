@@ -30,7 +30,6 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
                 "app.initializedata=false",
                 "app.listener.active=false",
                 "app.fullblownrabbit=true",
-//                "app.data.inmemory=false",
                 "spring.cloud.config.enabled=false"
         })
 @ActiveProfiles(value = {"integrationtest"})
