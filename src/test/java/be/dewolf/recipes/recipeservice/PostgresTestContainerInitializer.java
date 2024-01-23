@@ -8,7 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class PostgresTestContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer(DockerImageName.parse("arm64v8/postgres").asCompatibleSubstituteFor("postgres"));
+    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer(DockerImageName.parse("postgres").asCompatibleSubstituteFor("postgres"));
 
     static {
         postgreSQLContainer.start();
