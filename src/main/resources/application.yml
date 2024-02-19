@@ -13,6 +13,7 @@ spring:
       request-connect-timeout: 5000
       request-read-timeout: 5000
       uri: "http://localhost:8888"
+      enabled: false
   config:
     import: "optional:configserver:"
   datasource:

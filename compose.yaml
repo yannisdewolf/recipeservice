@@ -1,12 +1,23 @@
 services:
   postgres:
     image: postgres:16.1
+    container_name: recipe-postgress
     environment:
       - 'POSTGRES_USER=user'
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_DB=cuisinedb_recipes'
     ports:
       - 5432:5432
+
+  recipeservice:
+    image: recipe-service:latest
+    depends_on:
+      - postgres
+    ports:
+      - 9001:8085
+    environment:
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://recipe-postgress:5432/cuisinedb_recipes'
+
   zipkin:
     image: 'openzipkin/zipkin:latest'
     ports:
@@ -20,6 +31,7 @@ services:
       - postgres
     environment:
       ADMINER_DEFAULT_SERVER: mysql # since we use docker, this should be the same name as the service from the db
+
   rabbitmq:
     image: rabbitmq:3.12.7-management-alpine
     container_name: 'rabbitmq'

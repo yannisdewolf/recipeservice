@@ -21,22 +21,47 @@ Based on the BookService from Cloud Native Spring in Action book.
 
 
 ## Docker
-TODO: create a Dockerfile
+
+Build the image:
+```bash
+mvn clean verify -DskipTests && \
+docker build --build-arg JAR_FILE=target/recipeservice-0.0.1-SNAPSHOT.jar -t recipe-service .
+```
+
+Run the image:
+```bash
+docker run -d \
+  --name recipe-service \
+  --net recipe-network \
+  -p 9001:8085 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://recipe-postgress:5432/cuisinedb_recipes \
+  recipe-service
+```
 
 ## Docker compose
 A Docker compose file is included. 
-When starting the service,
-it will automatically launch the docker compose file and start following containers:
-
-When stopping the service, it will automatically stop the containers.
-
-For more info, see
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.docker-compose
 
 # Postgres
 
 Credentials:
 user/secret
+
+Run postgres without Compose
+
+```bash
+docker run -d \
+  --name recipe-postgress \
+  --net recipe-network \
+  -e POSTGRES_USER=user \
+  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_DB=cuisinedb_recipes \
+  -p 5432:5432 \
+  postgres:16.1
+```
+# Recipeservice
+(this service)
+
+Will be reachable on port 9001
 
 # RabbitMQ
 
