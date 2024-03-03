@@ -52,13 +52,15 @@ public class RecipeController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public RecipeDto createRecipe(@RequestBody CreateRecipeDto createRecipeDto) {
-        Recipe recipe = recipeService.create(new RecipeCreateData(createRecipeDto.getName()));
+        log.debug("Create recipe {}", createRecipeDto);
+        Recipe recipe = recipeService.create(new RecipeCreateData(createRecipeDto.name()));
         return recipeDtoConverter.create(recipe);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteRecipe(@PathVariable("id") String recipeId) {
+        log.debug("Delete recipe with id {}", recipeId);
         recipeService.delete(RecipeId.from(recipeId));
     }
 
