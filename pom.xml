@@ -17,6 +17,9 @@
         <java.version>21</java.version>
 
         <spring-cloud.version>2023.0.0</spring-cloud.version>
+
+        <registryUsername>something</registryUsername>
+        <registryToken>something</registryToken>
     </properties>
 
     <dependencyManagement>
@@ -208,9 +211,18 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <layers>
-                        <enabled>true</enabled>
-                    </layers>
+
+                    <image>
+                        <name>ghcr.io/yannisdewolf/${project.artifactId}:${project.version}</name>
+                        <publish>true</publish>
+                    </image>
+                    <docker>
+                        <publishRegistry>
+                            <username>${registryUsername}</username>
+                            <password>${registryToken}</password>
+                            <url>ghcr.io/yannisdewolf</url>
+                        </publishRegistry>
+                    </docker>
                 </configuration>
             </plugin>
 
@@ -223,9 +235,9 @@
                         <exclude>**/*IntegrationTest</exclude>
                         <exclude>**/*ApplicationTests</exclude>
                     </excludes>
-<!--                    <testFailureIgnore>true</testFailureIgnore>-->
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

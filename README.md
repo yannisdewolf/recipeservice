@@ -38,6 +38,14 @@ docker run -d \
   recipe-service
 ```
 
+## Build and push the image via paketo: 
+
+```bash
+./mvnw spring-boot:build-image \
+"-DregistryUsername=yannisdewolf" \
+"-DregistryToken=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"
+```
+
 ## Docker compose
 A Docker compose file is included. 
 
