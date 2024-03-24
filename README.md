@@ -8,6 +8,14 @@ Service responsible for
 
 Based on the BookService from Cloud Native Spring in Action book.
 
+## Run the test suite
+
+There are 2 maven profiles present: 
+- the default _unittests_ to run the unit tests.
+- _integrationtests_ to run the more time-consuming integration tests
+
+Enable the profile with the command `mvn clean verify -Pintegrationtests`
+
 ## Flags in the properties
 | property            | values       | description                                                                                      |
 |---------------------|--------------|--------------------------------------------------------------------------------------------------|
@@ -43,7 +51,7 @@ docker run -d \
 ```bash
 ./mvnw spring-boot:build-image \
 "-DregistryUsername=yannisdewolf" \
-"-DregistryToken=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"
+"-DregistryToken=<see password manager>"
 ```
 
 ## Docker compose
