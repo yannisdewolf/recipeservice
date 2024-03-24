@@ -43,7 +43,7 @@ docker run -d \
 ```bash
 ./mvnw spring-boot:build-image \
 "-DregistryUsername=yannisdewolf" \
-"-DregistryToken=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"
+"-DregistryToken=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"
 ```
 
 ## Docker compose
